@@ -1,12 +1,12 @@
+import 'package:ecommerce_app_huma_volve/features/home/services/models/product_model.dart';
 import 'package:flutter/material.dart';
-import '../../../core/dummy_data.dart';
 import '../../../core/theme.dart';
 import '../widgets/color_selector.dart';
 import '../widgets/size_selector.dart';
 import '../../../core/widgets/primary_button.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
-  final Product product;
+  final ProductModel product;
 
   const ProductDetailsScreen({super.key, required this.product});
 
@@ -17,12 +17,13 @@ class ProductDetailsScreen extends StatefulWidget {
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   late Color _selectedColor;
   late String _selectedSize;
-
+final List<Color> _colors = [Colors.black, Colors.blue, Colors.red];
+final List<String> _sizes = ['S', 'M', 'L', 'XL'];
   @override
   void initState() {
     super.initState();
-    _selectedColor = widget.product.colors.first;
-    _selectedSize = widget.product.sizes.first;
+    _selectedColor = _colors.first;
+    _selectedSize = _sizes.first;
   }
 
   @override
@@ -32,7 +33,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: 400,
+            expandedHeight: 300,
             pinned: true,
             backgroundColor: AppTheme.background,
             leading: IconButton(
@@ -66,6 +67,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 child: Image.network(
                   widget.product.imageUrl,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: Colors.grey.shade200,
+                    child: const Center(
+                      child: Icon(
+                        Icons.image_not_supported_outlined,
+                        color: Colors.grey,
+                        size: 40,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -97,7 +108,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                         const SizedBox(width: 16),
                         Text(
-                          '\$${widget.product.price.toStringAsFixed(2)}',
+                          '\$${(widget.product.price ?? 0).toStringAsFixed(2)}',
                           style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                             color: AppTheme.primary,
                             fontSize: 24,
@@ -114,7 +125,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      widget.product.description,
+                      widget.product.description ?? '',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         height: 1.6,
                         fontSize: 16,
@@ -129,7 +140,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
                     const SizedBox(height: 12),
                     ColorSelector(
-                      colors: widget.product.colors,
+                      colors: _colors,
                       selectedColor: _selectedColor,
                       onColorSelected: (color) {
                         setState(() {
@@ -146,7 +157,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
                     const SizedBox(height: 12),
                     SizeSelector(
-                      sizes: widget.product.sizes,
+                      sizes: _sizes,
                       selectedSize: _selectedSize,
                       onSizeSelected: (size) {
                         setState(() {

@@ -1,10 +1,10 @@
+import 'package:ecommerce_app_huma_volve/features/home/services/models/product_model.dart';
 import 'package:flutter/material.dart';
-import '../../../core/dummy_data.dart';
-import '../../../core/theme.dart';
-import '../../details/screens/product_details_screen.dart';
+import '../../../../core/theme.dart';
+import '../../../details/screens/product_details_screen.dart';
 
 class ProductCard extends StatelessWidget {
-  final Product product;
+  final ProductModel product;
 
   const ProductCard({super.key, required this.product});
 
@@ -53,6 +53,16 @@ class ProductCard extends StatelessWidget {
                         fit: BoxFit.cover,
                         width: double.infinity,
                         height: double.infinity,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey.shade200,
+                        child: const Center(
+                          child: Icon(
+                            Icons.image_not_supported_outlined,
+                            color: Colors.grey,
+                            size: 40,
+                          ),
+                        ),
+                      ),
                       ),
                     ),
                   ),
@@ -98,7 +108,7 @@ class ProductCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '\$${product.price.toStringAsFixed(2)}',
+                          '\$${(product.price ?? 0).toStringAsFixed(2)}',
                           style: const TextStyle(
                             color: AppTheme.primary,
                             fontWeight: FontWeight.bold,
