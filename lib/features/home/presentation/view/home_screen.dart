@@ -23,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
     context.read<HomeCubit>().loadHomeData();
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,42 +119,46 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 32),
                     BlocBuilder<HomeCubit, HomeStates>(
                       buildWhen: (previous, current) {
-                        if(current is ProductsLoadingState || 
-                          current is ProductsSuccessState  || 
-                          current is ProductsFailureState){
+                        if (current is ProductsLoadingState ||
+                            current is ProductsSuccessState ||
+                            current is ProductsFailureState) {
                           return false;
                         }
                         return true;
                       },
                       builder: (context, state) {
-                        if(state is CategoriesLoadingState){
+                        if (state is CategoriesLoadingState) {
                           return Center(child: CircularProgressIndicator());
-                        }else if (state is CategoriesFailureState) {
+                        } else if (state is CategoriesFailureState) {
                           return Center(child: Text(state.errorMessage));
-                        } else if (state is CategoriesSuccessState){
+                        } else if (state is CategoriesSuccessState) {
                           final categories = state.categories;
                           return SizedBox(
-                          height: 44,
-                          child: ListView.separated(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: categories.length,
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(width: 12),
-                            itemBuilder: (context, index) {
-                              return CategoryChip(
-                                label: categories[index].name ?? 'all',
-                                isSelected: _selectedCategoryIndex == index,
-                                onTap: () {
-                                  if (_selectedCategoryIndex == index) return;
-                                  setState(() {
-                                    _selectedCategoryIndex = index;
-                                  });
-                                  context.read<HomeCubit>().loadHomeData();
-                                },
-                              );
-                            },
-                          ),
-                        );
+                            height: 44,
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: categories.length,
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(width: 12),
+                              itemBuilder: (context, index) {
+                                return CategoryChip(
+                                  label: categories[index].name ?? 'all',
+                                  isSelected: _selectedCategoryIndex == index,
+                                  onTap: () {
+                                    if (_selectedCategoryIndex == index) return;
+                                    setState(() {
+                                      _selectedCategoryIndex = index;
+                                    });
+                                    context
+                                        .read<HomeCubit>()
+                                        .getProductsByCategoryId(
+                                          categories[index].id,
+                                        );
+                                  },
+                                );
+                              },
+                            ),
+                          );
                         } else {
                           return SizedBox.shrink();
                         }
@@ -164,40 +169,41 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             BlocBuilder<HomeCubit, HomeStates>(
-            buildWhen: (previous, current) =>
-                current is ProductsLoadingState ||
-                current is ProductsSuccessState ||
-                current is ProductsFailureState,
-            builder: (context, state) {
-              if (state is ProductsLoadingState) {
-                return const SliverToBoxAdapter(
-                  child: Center(child: CircularProgressIndicator()),
+              buildWhen: (previous, current) =>
+                  current is ProductsLoadingState ||
+                  current is ProductsSuccessState ||
+                  current is ProductsFailureState,
+              builder: (context, state) {
+                if (state is ProductsLoadingState) {
+                  return const SliverToBoxAdapter(
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                if (state is ProductsFailureState) {
+                  return SliverToBoxAdapter(
+                    child: Center(child: Text(state.errorMessage)),
+                  );
+                }
+                if (state is! ProductsSuccessState) {
+                  return const SliverToBoxAdapter(child: SizedBox.shrink());
+                }
+                final products = state.products;
+                return SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  sliver: SliverGrid(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.7,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                        ),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      return ProductCard(product: products[index]);
+                    }, childCount: products.length),
+                  ),
                 );
-              }
-              if (state is ProductsFailureState) {
-                return SliverToBoxAdapter(
-                  child: Center(child: Text(state.errorMessage)),
-                );
-              }
-              if (state is! ProductsSuccessState) {
-                return const SliverToBoxAdapter(child: SizedBox.shrink());
-              }
-              final products = state.products;
-              return  SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              sliver: SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.7,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                ),
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  return ProductCard(product: products[index]);
-                }, childCount: products.length),
-              ),
-            );
-            },
+              },
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 24)),
           ],

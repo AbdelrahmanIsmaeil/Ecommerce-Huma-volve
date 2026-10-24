@@ -12,40 +12,35 @@ class HomeCubit extends Cubit<HomeStates> {
     required this.getCategoriesUseCase,
   }) : super(HomeInitial());
 
-  void loadHomeData() async {
-    int categoryId = 0;
+  Future<void> loadHomeData() async {
     emit(CategoriesLoadingState());
 
     final categories = await getCategoriesUseCase.invoke();
-    categories.fold(
+    final categoryList = categories.fold(
       (failure) {
         emit(CategoriesFailureState(failure.failureMessage));
+        return null;
       },
       (categories) {
-        categoryId = categories[0].id;
         emit(CategoriesSuccessState(categories));
+        return categories;
       },
     );
+    if (categoryList == null || categoryList.isEmpty) return;
 
-    final products = await getProductsUseCase.invoke(categoryId);
-    products.fold((failure) {
-      emit(ProductsFailureState(failure.failureMessage));
-    }, (products) {
-    emit(ProductsSuccessState(products));
-  },
-  );
+    await getProductsByCategoryId(categoryList.first.id);
   }
 
-  void getProductsByCategoryId(int id) async {
+  Future<void> getProductsByCategoryId(int id) async {
     emit(ProductsLoadingState());
     final products = await getProductsUseCase.invoke(id);
     products.fold(
-    (failure) {
-      emit(ProductsFailureState(failure.failureMessage));
-    },
-    (products) {
-      emit(ProductsSuccessState(products));
-    },
-  );
-}
+      (failure) {
+        emit(ProductsFailureState(failure.failureMessage));
+      },
+      (products) {
+        emit(ProductsSuccessState(products));
+      },
+    );
+  }
 }
