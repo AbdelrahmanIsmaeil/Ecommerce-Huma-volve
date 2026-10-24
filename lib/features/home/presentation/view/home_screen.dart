@@ -1,10 +1,10 @@
-import 'package:ecommerce_app_huma_volve/features/home/cubit/home_cubit.dart';
-import 'package:ecommerce_app_huma_volve/features/home/cubit/home_states.dart';
+import 'package:ecommerce_app_huma_volve/features/home/presentation/view_model/home_cubit.dart';
+import 'package:ecommerce_app_huma_volve/features/home/presentation/view_model/home_states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/dummy_data.dart';
-import '../../../core/theme.dart';
+import '../../../../core/dummy_data.dart';
+import '../../../../core/theme.dart';
 import 'widgets/product_card.dart';
 import 'widgets/category_chip.dart';
 
@@ -129,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         if(state is CategoriesLoadingState){
                           return Center(child: CircularProgressIndicator());
                         }else if (state is CategoriesFailureState) {
-                          return Center(child: Text(state.failureMessage));
+                          return Center(child: Text(state.errorMessage));
                         } else if (state is CategoriesSuccessState){
                           final categories = state.categories;
                           return SizedBox(
@@ -148,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   setState(() {
                                     _selectedCategoryIndex = index;
                                   });
-                                  context.read<HomeCubit>().getProductsByCategory(categories[index].id!);
+                                  context.read<HomeCubit>().loadHomeData();
                                 },
                               );
                             },
@@ -176,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
               }
               if (state is ProductsFailureState) {
                 return SliverToBoxAdapter(
-                  child: Center(child: Text(state.failureMessage)),
+                  child: Center(child: Text(state.errorMessage)),
                 );
               }
               if (state is! ProductsSuccessState) {

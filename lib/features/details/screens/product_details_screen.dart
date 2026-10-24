@@ -1,12 +1,13 @@
-import 'package:ecommerce_app_huma_volve/features/home/services/models/product_model.dart';
+import 'package:ecommerce_app_huma_volve/features/home/domain/entities/home_product_entity.dart';
 import 'package:flutter/material.dart';
+
 import '../../../core/theme.dart';
 import '../widgets/color_selector.dart';
 import '../widgets/size_selector.dart';
 import '../../../core/widgets/primary_button.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
-  final ProductModel product;
+  final HomeProductEntity product;
 
   const ProductDetailsScreen({super.key, required this.product});
 
@@ -17,8 +18,18 @@ class ProductDetailsScreen extends StatefulWidget {
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   late Color _selectedColor;
   late String _selectedSize;
-final List<Color> _colors = [Colors.black, Colors.blue, Colors.red];
-final List<String> _sizes = ['S', 'M', 'L', 'XL'];
+  final List<Color> _colors = [
+    Colors.black,
+    Colors.blue,
+    Colors.red,
+  ];
+  final List<String> _sizes = [
+    'S',
+    'M',
+    'L',
+    'XL',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -28,6 +39,8 @@ final List<String> _sizes = ['S', 'M', 'L', 'XL'];
 
   @override
   Widget build(BuildContext context) {
+    final imageUrl = widget.product.images.isNotEmpty ? widget.product.images.first : '';
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: CustomScrollView(
@@ -43,7 +56,10 @@ final List<String> _sizes = ['S', 'M', 'L', 'XL'];
                   color: Colors.white.withValues(alpha: 0.9),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.arrow_back_ios_new, size: 16),
+                child: const Icon(
+                  Icons.arrow_back_ios_new,
+                  size: 16,
+                ),
               ),
               onPressed: () => Navigator.pop(context),
             ),
@@ -55,7 +71,10 @@ final List<String> _sizes = ['S', 'M', 'L', 'XL'];
                     color: Colors.white.withValues(alpha: 0.9),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.favorite_border, size: 18),
+                  child: const Icon(
+                    Icons.favorite_border,
+                    size: 18,
+                  ),
                 ),
                 onPressed: () {},
               ),
@@ -65,7 +84,7 @@ final List<String> _sizes = ['S', 'M', 'L', 'XL'];
               background: Hero(
                 tag: 'product-${widget.product.id}',
                 child: Image.network(
-                  widget.product.imageUrl,
+                  imageUrl,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
                     color: Colors.grey.shade200,
@@ -85,11 +104,21 @@ final List<String> _sizes = ['S', 'M', 'L', 'XL'];
             child: Container(
               decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(
+                    32,
+                  ),
+                ),
               ),
-              transform: Matrix4.translationValues(0.0, -32.0, 0.0),
+              transform: Matrix4.translationValues(
+                0.0,
+                -32.0,
+                0.0,
+              ),
               child: Padding(
-                padding: const EdgeInsets.all(24.0),
+                padding: const EdgeInsets.all(
+                  24.0,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -99,7 +128,7 @@ final List<String> _sizes = ['S', 'M', 'L', 'XL'];
                       children: [
                         Expanded(
                           child: Text(
-                            widget.product.name,
+                            widget.product.title,
                             style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                               fontSize: 28,
                               height: 1.2,
@@ -108,7 +137,7 @@ final List<String> _sizes = ['S', 'M', 'L', 'XL'];
                         ),
                         const SizedBox(width: 16),
                         Text(
-                          '\$${(widget.product.price ?? 0).toStringAsFixed(2)}',
+                          '\$${widget.product.price.toStringAsFixed(2)}',
                           style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                             color: AppTheme.primary,
                             fontSize: 24,
@@ -125,53 +154,79 @@ final List<String> _sizes = ['S', 'M', 'L', 'XL'];
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      widget.product.description ?? '',
+                      widget.product.description,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         height: 1.6,
                         fontSize: 16,
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(
+                      height: 24,
+                    ),
                     Text(
                       'Select Color',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style:
+                          Theme.of(
+                            context,
+                          ).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(
+                      height: 12,
+                    ),
                     ColorSelector(
                       colors: _colors,
                       selectedColor: _selectedColor,
-                      onColorSelected: (color) {
-                        setState(() {
-                          _selectedColor = color;
-                        });
-                      },
+                      onColorSelected:
+                          (
+                            color,
+                          ) {
+                            setState(() {
+                              _selectedColor = color;
+                            });
+                          },
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(
+                      height: 24,
+                    ),
                     Text(
                       'Select Size',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style:
+                          Theme.of(
+                            context,
+                          ).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(
+                      height: 12,
+                    ),
                     SizeSelector(
                       sizes: _sizes,
                       selectedSize: _selectedSize,
-                      onSizeSelected: (size) {
-                        setState(() {
-                          _selectedSize = size;
-                        });
-                      },
+                      onSizeSelected:
+                          (
+                            size,
+                          ) {
+                            setState(() {
+                              _selectedSize = size;
+                            });
+                          },
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(
+                      height: 32,
+                    ),
                     PrimaryButton(
                       text: 'Add to Cart',
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(
                           SnackBar(
-                            content: Text('${widget.product.name} added to cart'),
+                            content: Text(
+                              '${widget.product.title} added to cart',
+                            ),
                             behavior: SnackBarBehavior.floating,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -181,7 +236,9 @@ final List<String> _sizes = ['S', 'M', 'L', 'XL'];
                         );
                       },
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(
+                      height: 24,
+                    ),
                   ],
                 ),
               ),
